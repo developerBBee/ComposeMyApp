@@ -4,19 +4,22 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Bottom
+import androidx.compose.ui.Alignment.Companion.BottomEnd
+import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +42,7 @@ class MainActivity : ComponentActivity() {
 }
 
 // Shopping cart for electronic commerce UI
-data class Item (val itemId: Int, val itemName: String, val itemPrice: Int, var itemBuyNum: Int)
+data class Item (val itemId: Int, val itemName: String, val itemPrice: Int, var itemPurchase: Int)
 
 @Composable
 fun ItemListView(itemList: List<Item>) {
@@ -51,8 +54,11 @@ fun ItemListView(itemList: List<Item>) {
         R.drawable.boxdesign_item005,
     )
 
-    LazyColumn (Modifier.background(color = MaterialTheme.colors.background)
-        .fillMaxWidth().padding(10.dp)
+    LazyColumn (
+        Modifier
+            .background(color = MaterialTheme.colors.background)
+            .fillMaxWidth()
+            .padding(10.dp)
     ) { // scroll list vertical
         items(itemList) { item ->
             ItemView(item, resourcesImage)
@@ -62,7 +68,10 @@ fun ItemListView(itemList: List<Item>) {
 
 @Composable
 fun ItemView(item: Item, resourcesImage: List<Int>) {
-    Row(modifier = Modifier.fillMaxWidth()
+
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(110.dp)
         .padding(5.dp)
     ) {
         Image(
@@ -73,26 +82,101 @@ fun ItemView(item: Item, resourcesImage: List<Int>) {
                 .padding(5.dp)
         )
         Spacer(modifier = Modifier.width(2.dp))
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Text(
                 text = item.itemName,
                 fontSize = 20.sp,
-                color = MaterialTheme.colors.primary,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
                 text = "¥ " + String.format("%,d", item.itemPrice),
+                color = MaterialTheme.colors.primary,
+                fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Right,
-                color = MaterialTheme.colors.primary,
                 modifier = Modifier.fillMaxWidth()
             )
+            Row (
+                verticalAlignment = Bottom,
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Text(
+                    text = "購入数 ",
+                    fontSize = 16.sp
+                )
+                DropListView(item)
+                Spacer(modifier = Modifier.width(2.dp))
+                TextButton(
+                    modifier = Modifier.wrapContentHeight(),
+                    contentPadding = PaddingValues(0.dp),
+                    onClick = {
+                        /* TODO: Delete item in shopping cart */
+                    }) {
+                    Text(
+                        text = "削除",
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
     }
     Divider(modifier = Modifier.padding(0.dp, 10.dp, 0.dp, 0.dp))
 }
+
+@Composable
+fun DropListView(item: Item) {
+    var expandedDropdownMenu by remember { mutableStateOf(false) }
+    val itemsDropdownMenu = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8 ,9)
+    val disabledValue = 9
+    var selectedIndex by remember { mutableStateOf(item.itemPurchase) }
+    Box(modifier = Modifier
+//        .fillMaxSize()
+//        .wrapContentSize(Alignment.TopStart)
+    ) {
+        Text(
+            text = itemsDropdownMenu[selectedIndex].toString(),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .wrapContentWidth()
+                .width(30.dp)
+                .clickable(onClick = { expandedDropdownMenu = true })
+                .background(
+                    color = MaterialTheme.colors.background,
+                    shape = MaterialTheme.shapes.medium
+                )
+                .border(
+                    width = 1.5.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.medium
+                )
+        )
+        DropdownMenu(
+            expanded = expandedDropdownMenu,
+            onDismissRequest = { expandedDropdownMenu = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colors.background)
+        ) {
+            itemsDropdownMenu.forEachIndexed { index, s ->
+                DropdownMenuItem(onClick = {
+                    selectedIndex = index
+                    expandedDropdownMenu = false
+                }) {
+                    val disabledText = if (s == disabledValue) {
+                        " (Disabled)"
+                    } else {
+                        ""
+                    }
+                    Text(text = s.toString() + disabledText)
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun Greeting(name: String) {
@@ -116,6 +200,18 @@ fun Greeting(name: String) {
 @Composable
 fun ItemListPreview() {
     ComposeMyAppTheme {
-        ItemListView(ItemListData.itemsShoppingCart)
+        Surface {
+            ItemListView(ItemListData.itemsShoppingCart)
+        }
+    }
+}
+
+@Preview
+@Composable
+fun DropListPreview() {
+    ComposeMyAppTheme {
+        Surface {
+            DropListView(ItemListData.itemsShoppingCart[0])
+        }
     }
 }
