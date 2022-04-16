@@ -11,12 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Bottom
-import androidx.compose.ui.Alignment.Companion.BottomEnd
-import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -99,24 +95,25 @@ fun ItemView(item: Item, resourcesImage: List<Int>) {
                 modifier = Modifier.fillMaxWidth()
             )
             Row (
-                verticalAlignment = Bottom,
-                modifier = Modifier.fillMaxHeight()
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxHeight().padding(10.dp, 0.dp, 10.dp, 0.dp)
             ) {
                 Text(
                     text = "購入数 ",
                     fontSize = 16.sp
                 )
                 DropListView(item)
-                Spacer(modifier = Modifier.width(2.dp))
+                Spacer(modifier = Modifier.width(20.dp))
                 TextButton(
-                    modifier = Modifier.wrapContentHeight(),
+                    modifier = Modifier.height(24.dp),
                     contentPadding = PaddingValues(0.dp),
                     onClick = {
                         /* TODO: Delete item in shopping cart */
                     }) {
                     Text(
+                        modifier = Modifier.wrapContentHeight(),
                         text = "削除",
-                        fontSize = 16.sp
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -141,7 +138,7 @@ fun DropListView(item: Item) {
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .wrapContentWidth()
-                .width(30.dp)
+                .width(50.dp)
                 .clickable(onClick = { expandedDropdownMenu = true })
                 .background(
                     color = MaterialTheme.colors.background,
